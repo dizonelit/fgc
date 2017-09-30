@@ -1,0 +1,538 @@
+
+zLAMP_Installation_Steps
+
+Step 1. Open Terminal/Konsole
+
+Step 2. Install LAMP
+
+Step 2.1 Single command 
+
+	 sudo apt-get install lamp-server^
+         <enter password>
+
+Step 2.2 Individual Install (use this if Step 2.1 won't work)
+
+Step 2.2.1 Install Apache
+
+	   sudo apt-get install apache2
+
+Step 2.2.2 Install MySQL
+
+	   sudo apt-get install mysql-server
+
+Step 2.2.3 Install PHP
+
+	   sudo apt-get install php5 libapache2-mod-php5
+
+Step 2.2.4 Restart Server
+
+	   sudo /etc/init.d/apache2 restart	
+
+Step 2.2.5 Check Apache
+
+	   Open a web browser and navigate to http://localhost/. 
+           You should see a message saying It works!   
+
+Step 2.2.6 Check PHP
+
+	   php -r 'echo "\n\nYour PHP installation is working fine.\n\n\n";'
+
+Step 3. During installation, it will be asked to provide MySQL root password
+
+	press Enter key or enter a password 
+
+	Note: If a password is entered, take note/remember the password
+
+Step 4. Start the Apache Web Server
+
+	After the installation is finished enter the following:
+
+	sudo service apache2 start
+
+Step 5. Check if Apached was installed correctly
+
+	Open a web server and type on the address field:
+
+	http://localhost
+
+   	The default page for Apache2 is displayed.
+
+Step 6.	Provide write permissions to folder /var/www:
+
+   	sudo chmod 777 -R /var/www
+
+     	or
+
+   	sudo chmod 755 -R /var/www
+
+	or 
+
+    	- Go to folder/file, right click 
+    	- Choose tab Permission, on dropdowns, choose Read/Write
+	- Display permissions
+	  ls -l /var/www
+
+Step 7.	Check if PHP was correctly installed
+
+   	sudo nano /var/www/html/info.php
+
+Step 8.	Enter the following on info.php and save 
+
+   	<?php
+   	phpinfo();
+   	?>
+
+   	press Ctl+O to save the file
+   	press Enter
+   	press Ctl+X to exit from nano
+
+Step 9. Open a web browser and type
+
+   	http://localhost/info.php
+
+Step 10. Restart the computer
+
+Step 11. Create Database
+
+Step 11.1 Open Terminal/Konsole
+
+Step 11.2 Run MySQL 
+ 
+          sudo mysql
+	  <enter password>
+
+	  or 
+
+	  $ mysql -u root -p (press Enter key)
+     	  - enter password or press Enter key
+     	  - press Enter key
+
+Step 11.3 Create the database
+
+	  Syntax:  create database <name of database>
+	  Example: mysql > create database mydb;
+
+Step 11.4 Create User of Database
+
+	  Example: create user ‘fgc’ with password ‘fgc’;
+
+          mysql> use fgc;
+          create user ‘fgc’@’localhost’ identified by ‘fgc’;
+          grant all privileges on *.* to ‘fgc’@’localhost’;
+
+Step 11.5 List Users of Database 
+
+	  Example: SELECT User, Host, Password FROM mysql.user; 	
+	
+
+Step 12. Create Database Backup
+
+Step 12.1 Create Backup - Copy database to USB
+
+          $ mysqldump -u root -p mydb > /usb/mydb_backup.sql
+  
+          (if asked for a password, enter root)
+
+Step 13. Restore Database from USB to the same Server or Another Server
+
+Step 13.1 Create the database in another server
+   
+          mysq> create database mydb;
+
+Step 13.2 Insert USB on the other server
+
+Step 13.3 Issue the following on terminal
+
+          $ mysql -u root -p mydb < /usb/mydb_backup.sql
+
+
+Step 14. Create Tables
+
+Step 14.1 Examples
+
+	mysql> use fgc;
+        mysql> create table events 
+                (seq_num int not null primary key auto_increment,
+                sku int,
+		author int,
+                component varchar(25),
+                event_date date,
+                event_desc text,
+                event_time time,
+                event_type char(16)
+                );
+
+	mysql> create table dsales_hdr
+        	(inv_num int not null primary key auto_increment,
+		credits float(7,2),
+                customer varchar(32),
+                disc_amt float(7,2),
+                disc_per float(7,2),
+                disc_text varchar(32),
+		pay_type char(1),
+		rewards float(7,2),
+		sdate date,
+		tend_amt float(7,2),
+		total_amt float(7,2)
+		);
+
+	mysql> create table dsales_dtl
+		(inv_num int(11) not null,
+               	item_num tinyint not null,
+		item_desc varchar(32),
+                item_disc float(7,2),
+		price float(7,2),
+		qty int(11),
+		sku int(11),
+		total_amt float(7,2),
+		primary key (inv_num, item_num)
+		);
+		
+   	mysql> create table sales_dtl 
+                (seq_num int not null primary key auto_increment,
+                inv_num int,
+		item_amt float(7,2),
+                item_desc varchar(48),
+                item_disc float(7,2),
+                item_id int, 
+                item_num int,
+		item_price float(7,2),
+		item_qty int                               
+                );
+
+	mysql> create table trans_hdr 
+		(id int not null primary key, 
+		tcode varchar(16), 
+		balance float(7,2), 
+		tdate date);
+
+	mysql> create table trans_dtl (
+		recnum int not null primary key auto_increment, 
+		id int, 
+		amount float(7,2), 
+		tdate date, 
+		description varchar(32), 
+		tcode varchar(16), 
+		ttype char(1), 
+		reference varchar(16));
+
+4.3.? Tables - Display List of Tables
+
+        mysql> use fgc;
+        mysql> show tables;
+
+
+4.3.? Tables - Display Table Columns
+
+        mysql> use fgc
+        mysql> show columns from laptop;
+
+4.3.1 Tables - Generate Creation Script
+
+    Syntax:  show create table <table name>;
+    Xample: show create table laptop;
+
+4.3.2 Tables - Dump table contents
+    
+    Syntax:  mysqldump [OPTIONS] database [tables]
+    Xample:  mysqldump -u username -p db_name table1_name table2_name table3_name > dump.sql
+
+4.3.3 Tables - Copy data from table to backup file
+
+    object:  copy table 'model' from database 'fgc' to backup file 'model.sql'
+    syntax:  mysqldump -u root -p database table > backup.sql
+    sample:  mysqldump -u root -p fgc model > model.sql
+
+4.3.4 Tables - Copy/restore data from backup file to table
+
+    object:  copy backup file 'model.sql' to table 'model' in database 'fgc'
+    syntax:  mysql -u root -p database < backup.sql
+    sample:  mysql -u root -p fgc < model.sql
+
+4.3.5 Tables - Set the initial/starting value of an auto increment field
+
+    object:  set the initial value of table 'laptop'
+    syntax:  ALTER TABLE tbl AUTO_INCREMENT = 100; 
+    sample:  ALTER TABLE laptop AUTO_INCREMENT = 100;
+
+4.3.5.1 Tables - Reset the initial/starting value of an auto increment field  
+    object:  reset the initial value of table 'laptop' with primary key 'sku'
+    a. delete all records in table newtable 
+       syntax: delete from newtable;
+    b. reset the starting number to <number> (e.g. 1001)
+       sample: alter table newtable auto_increment = 1001;
+
+4.3.6 Table - Copy data from a table to backup file
+
+     object:  copy table 'model' from database 'fgc' to backup file 'model.sql'
+     syntax:  mysqldump -u root -p database table > backup.sql
+     sample:  mysqldump -u root -p fgc model > model.sql
+
+4.3.7 Table - Copy/restore data from backup file to a table
+
+     object:  copy backup file 'model.sql' to table 'model' in database 'fgc'
+     syntax:  mysql -u root -p database < backup.sql
+     sample:  mysql -u root -p fgc  < model.sql
+
+4.3.? Table - Create Composite Primary Key
+
+	alter table prices add primary key (cpumodel, hdsize, memsize, effdate);
+
+4.3.? Table - Add Column to Primary Key
+
+	   If primary key already exist;
+                alter table prices drop primary key;
+                       alter table prices add primary key (field1, field2, field3, field4);
+
+4.3.? Table - Rename
+        mysql> rename table <oldname> to <newname>;
+
+4.3.? Table - Delete all records from a table
+        mysql> delete from <tablename>;
+
+4.3.? Table - Delete a table
+        mysql> drop table <tablename>;
+
+
+4.4 Columns ---------------------------------------------------------
+
+
+4.4.? Columns - Display Table Columns
+
+        mysql> use fgc
+        mysql> show columns from laptop;
+
+
+4.4.1 Columns - Add Column 
+
+    Syntax: ALTER TABLE <tablename> ADD <newcolumn> <fieldtype> (<length>) AFTER <existingcolumn>
+    Xample: ALTER TABLE laptop ADD psu VARCHAR (16) AFTER price;
+
+4.4.2 Columns - Change Name of Column
+
+    Syntax: ALTER TABLE <tablename> CHANGE <currentfieldname> <newfieldname> <datatype>;
+    Xample: ALTER TABLE laptop CHANGE cpubit cpubit varchar(6);
+
+4.4.3 Columns - Change Length of Column
+
+    Syntax: ALTER TABLE <table_name> MODIFY <col_name> VARCHAR(new-length);
+    Xample: ALTER TABLE laptop MODIFY optical varchar(24);
+
+4.4.? Columns - Move column
+
+    Syntax: ALTER TABLE Employees MODIFY COLUMN empName VARCHAR(50) AFTER department;
+
+4.4.? Columns - Change Datatype
+
+        mysql> use fgc
+        mysql> alter table <tablename> modify <columnname> <datatype>; 
+
+4.4.? Columns - Reset Auto Increment to Zero (0)
+
+        mysql> truncate table users;
+
+4.4.? Columns - Reset Auto Increment to Starting Value (e.g. start with 1000)
+
+        mysql> alter table <tablename> auto_increment=1000;
+
+4.4.4 Columns - Delete Column
+
+    Syntax: ALTER TABLE <tablename> DROP COLUMN <columnname>;
+    Xample: ALTER TABLE laptop DROP COLUMN psu;
+
+4.4.5 Columns - Drop Primary Key(s)
+
+    Syntax: ALTER TABLE <tablename> DROP primary key;
+    Xample: ALTER TABLE prices drop primary key;
+
+4.4.6 Columns - Password Encryption
+
+    Using MD5 in your application is easy. Here's how your queries will need to be to take advantage of encryption offered by MD5.
+
+    First, let's create a table:
+
+    mysql> create table user_md5 (user_name VARCHAR(16), password VARCHAR(32));
+    Query OK, 0 rows affected (0.00 sec)
+
+    Now let's insert a record with MD5 applied to the password field.
+
+    mysql> INSERT INTO user_md5 VALUES ('member1',MD5('secretpassword') );
+    Query OK, 1 row affected (0.00 sec)
+
+    Finally, let's see if it all works when we try to authenticate a user.
+
+    mysql> SELECT * FROM user_md5 WHERE user_name='member1' AND password=MD5('secretpassword');
+    +-----------+----------------------------------+
+    | user_name | password                         |
+    +-----------+----------------------------------+
+    | member1   | 2034f6e32958647fdff75d265b455ebf |
+    +-----------+----------------------------------+
+    1 row in set (0.00 sec)
+
+4.4.7 Columns - Make an existing column to contain unique values
+
+    Syntax: ALTER TABLE <tablename> MODIFY <fieldname> <datatype> NOT NULL UNIQUE;
+    Xample: ALTER TABLE volunteer MODIFY email varchar(32) NOT NULL UNIQUE;
+
+
+4.5 Data ---------------------------------------------------------
+
+4.5.1 Data - Save Output to a File
+
+    Syntax:  tee </path/filename>;
+    Xample: show create table laptop;
+             (the output will be displayed and saved to </path/filename>
+
+4.5.? Data - Insert Into Table
+
+        mysql> use fgc
+        
+        mysql> insert into laptop
+                (color, cpu_bit, cpu_model, cpu_speed, cpu_type,
+                 hd_size, maker, mem_size, mem_type, model, optical,
+                 os_bit, os_version, price, screen, webcam, wifi)
+                 values (‘red’, ‘64’, ‘intel core i5’, ‘2.069’, 
+			 ‘M3220’, 250, ‘HP’, 4, ‘DDR3’, 
+			 ‘Elitebook 8440p’, ‘CR-RW/DVD-R’, 64, 
+                         ‘Xubuntu 14.04’, ‘175.00’’, 14, ‘Y’, ‘Y’);
+
+4.5.? Data - Laptop - Update Records
+
+        mysql> use fgc
+        mysql> update laptop 
+                  set cpu_model=’Intel Core i5’, 
+                      cpu_speed=’2.069’,         
+                      cpu_type=’M3220’
+                  where sku=1;
+
+4.5.? Data - Get Last Value of a Column
+
+        mysql> select max(sku) from lapop;
+
+4.5.? Data - Update Values for Date and Time
+
+	mysql> update events
+        	set event_date = now(), 
+		event_time = cur_time();
+
+4.5.? Table - Delete all records from a table
+        mysql> delete from <tablename>;
+
+
+4.5.? Table - Retrieve Data
+
+4.5.? Table - Sort Retrieved Data
+
+4.5.? Table - Sort Retrieved Data
+
+4.5.? Table - Sort Retrieved Data
+
+4.5.? Table - Filter Retrieved Data
+
+4.5.? Table - Sort Retrieved Data - Standard Filters
+
+4.5.? Table - Sort Retrieved Data - Advanced Filters
+
+4.5.? Table - Calculated Fields
+
+4.5.? Table - Data Manipulation Functions
+
+4.5.? Table - Summarizing Data - Aggregates
+
+4.5.? Table - Grouping Data
+
+4.5.? Table - Subqueries
+
+4.5.? Table - Joining Tables
+
+4.5.? Table - Advanced Joins
+
+4.5.? Table - Combined Queries
+
+4.5.? Table - Views
+
+4.5.? Table - Stored Procedures
+
+4.5.? Table - Transaction Processing
+
+4.5.? Table - Cursors
+
+4.5.? Table - Advanced SQL Features
+4.5.? Table - Advanced SQL Features - Primary Keys
+4.5.? Table - Advanced SQL Features - Foreign Keys
+4.5.? Table - Advanced SQL Features - Unique Constraints
+4.5.? Table - Advanced SQL Features - Indexes
+4.5.? Table - Advanced SQL Features - Triggers
+
+
+
+4.5.? Table - Grouping Data
+
+4.5.? Table - CSV Output 
+
+4.6  General
+
+4.6.1 Clear mysql screen in terminal
+	mysql> system clear;
+
+SELECT order_id,product_name,qty
+FROM orders
+WHERE foo = 'bar'
+INTO OUTFILE '/tmp/orders.csv'
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n';
+
+
+
+Using MD5 in your application is easy. Here's how your queries will need to be to take advantage of encryption offered by MD5.
+
+
+First, let's create a table:
+
+mysql> create table user_md5 (user_name VARCHAR(16), password VARCHAR(32));
+Query OK, 0 rows affected (0.00 sec)
+
+
+
+Now let's insert a record with MD5 applied to the password field.
+
+mysql> INSERT INTO user_md5 VALUES ('member1',MD5('secretpassword') );
+Query OK, 1 row affected (0.00 sec)
+
+
+
+Finally, let's see if it all works when we try to authenticate a user.
+
+mysql> SELECT * FROM user_md5 WHERE user_name='member1' AND password=MD5('secretpassword');
++-----------+----------------------------------+
+| user_name | password                         |
++-----------+----------------------------------+
+| member1   | 2034f6e32958647fdff75d265b455ebf |
++-----------+----------------------------------+
+1 row in set (0.00 sec)
+
+
+=====================================================================
+5. PHP 
+
+5.1 Spaces (print 10 spaces)
+
+    format: str_repeat('&nbsp',10)
+
+5.2 Debug PHP code
+
+5.3 PHP IDE 
+
+    Sublime Tex
+
+    Atom io
+
+
+
+
+
+
+
+
+
